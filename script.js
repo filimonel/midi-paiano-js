@@ -14,6 +14,9 @@ const NOTE_DETAILS = [
   { note: "B", key: "M", frequency: 493.883 },
 ];
 
+// Added audio context
+const audioContext = new AudioContext();
+
 // Event Listeners
 
 // Keydown
@@ -40,9 +43,27 @@ function getNoteDetails(keyBoardKey) {
   return NOTE_DETAILS.find((n) => `Key${n.key}` === keyBoardKey);
 }
 
-function playNotes(note) {
+function playNotes(n) {
   NOTE_DETAILS.forEach((n) => {
     const keyElement = document.querySelector(`[data-note="${n.note}"]`);
     keyElement.classList.toggle("active", n.active || false);
+    if (n.oscillator != null) {
+      n.oscillator.stop();
+      n.oscillator.disconnect();
+    }
   });
+
+  const activeNotes = NOTE_DETAILS.filter((n) => n.active);
+  activeNotes.forEach((n) => {
+    startNote(n);
+  });
+}
+
+function startNote(noteDetail) {
+  const oscillator = audioContext.createOscillator();
+  oscillator.frequency = noteDetail.frequency;
+  oscillator.type = "sawtooth";
+  oscillator.connect(audioContext.destination);
+  oscillator.start();
+  noteDetail.oscillator = oscillator;
 }
