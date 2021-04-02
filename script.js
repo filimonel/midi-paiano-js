@@ -1,3 +1,4 @@
+// Key & Notes
 const NOTE_DETAILS = [
   { note: "C", key: "Z", frequency: 261.626 },
   { note: "Db", key: "S", frequency: 277.183 },
@@ -13,16 +14,35 @@ const NOTE_DETAILS = [
   { note: "B", key: "M", frequency: 493.883 },
 ];
 
+// Event Listeners
+
+// Keydown
 document.addEventListener("keydown", (e) => {
   if (e.repeat) return;
   let keyBoardKey = e.code;
-  console.log(getNoteDetails(keyBoardKey));
+  let noteDetail = getNoteDetails(keyBoardKey);
+  if (noteDetail == null) return;
+  noteDetail.active = true;
+  playNotes();
 });
 
+// Keyup
 document.addEventListener("keyup", (e) => {
-  console.log("up");
+  let keyBoardKey = e.code;
+  let noteDetail = getNoteDetails(keyBoardKey);
+  if (noteDetail == null) return;
+  noteDetail.active = false;
+  playNotes();
 });
 
+// functions
 function getNoteDetails(keyBoardKey) {
   return NOTE_DETAILS.find((n) => `Key${n.key}` === keyBoardKey);
+}
+
+function playNotes(note) {
+  NOTE_DETAILS.forEach((n) => {
+    const keyElement = document.querySelector(`[data-note="${n.note}"]`);
+    keyElement.classList.toggle("active", n.active || false);
+  });
 }
