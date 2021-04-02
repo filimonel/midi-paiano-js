@@ -10,5 +10,19 @@ const NOTE_DETAILS = [
   { note: "Ab", key: "H", frequency: 415.305 },
   { note: "A", key: "N", frequency: 440 },
   { note: "Bb", key: "J", frequency: 466.164 },
-  { note: "B", key: "M", frequency: 493.883 }
-]
+  { note: "B", key: "M", frequency: 493.883 },
+];
+
+document.addEventListener("keydown", (e) => {
+  if (e.repeat) return;
+  let keyBoardKey = e.code;
+  console.log(getNoteDetails(keyBoardKey));
+});
+
+document.addEventListener("keyup", (e) => {
+  console.log("up");
+});
+
+function getNoteDetails(keyBoardKey) {
+  return NOTE_DETAILS.find((n) => `Key${n.key}` === keyBoardKey);
+}
