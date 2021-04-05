@@ -1,3 +1,6 @@
+// Added audio context
+const audioContext = new AudioContext();
+
 // Key & Notes
 const NOTE_DETAILS = [
   { note: "C", key: "Z", frequency: 261.626 },
@@ -14,16 +17,13 @@ const NOTE_DETAILS = [
   { note: "B", key: "M", frequency: 493.883 },
 ];
 
-// Added audio context
-const audioContext = new AudioContext();
-
 // Event Listeners
 
 // Keydown
 document.addEventListener("keydown", (e) => {
   if (e.repeat) return;
-  let keyBoardKey = e.code;
-  let noteDetail = getNoteDetails(keyBoardKey);
+  const keyBoardKey = e.code;
+  const noteDetail = getNoteDetails(keyBoardKey);
   if (noteDetail == null) return;
   noteDetail.active = true;
   playNotes();
@@ -46,7 +46,7 @@ function getNoteDetails(keyBoardKey) {
 function playNotes(n) {
   NOTE_DETAILS.forEach((n) => {
     const keyElement = document.querySelector(`[data-note="${n.note}"]`);
-    keyElement.classList.toggle("active", n.active || false);
+    keyElement.classList.toggle("active", n.active);
     if (n.oscillator != null) {
       n.oscillator.stop();
       n.oscillator.disconnect();
@@ -54,16 +54,19 @@ function playNotes(n) {
   });
 
   const activeNotes = NOTE_DETAILS.filter((n) => n.active);
+  const gain = 1 / activeNotes.length;
   activeNotes.forEach((n) => {
-    startNote(n);
+    startNote(n, gain);
   });
 }
 
-function startNote(noteDetail) {
+function startNote(noteDetail, gain) {
+  const gainNode = audioContext.createGain();
+  gainNode.gain.value = gain;
   const oscillator = audioContext.createOscillator();
-  oscillator.frequency = noteDetail.frequency;
+  oscillator.frequency.value = noteDetail.frequency;
   oscillator.type = "sawtooth";
-  oscillator.connect(audioContext.destination);
+  oscillator.connect(gainNode).connect(audioContext.destination);
   oscillator.start();
   noteDetail.oscillator = oscillator;
 }
